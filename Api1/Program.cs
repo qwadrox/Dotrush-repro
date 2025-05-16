@@ -12,6 +12,8 @@ builder.Services.AddControllers();
 
 // Register our fake data service as a singleton
 builder.Services.AddSingleton<FakeDataService>();
+// Register our new order service as a singleton
+builder.Services.AddSingleton<OrderService>();
 
 var app = builder.Build();
 
