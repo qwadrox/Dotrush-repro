@@ -1,0 +1,350 @@
+openapi: 3.0.3
+info:
+  title: Product Inventory API
+  description: API for managing product inventory
+  version: 1.0.0
+servers:
+  - url: /api/v1
+paths:
+  /products:
+    get:
+      summary: Get all products
+      operationId: getProducts
+      tags:
+        - products
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter products by category
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Maximum number of items to return
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    post:
+      summary: Create a new product
+      operationId: createProduct
+      tags:
+        - products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreate'
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /products/{productId}:
+    get:
+      summary: Get product by ID
+      operationId: getProductById
+      tags:
+        - products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product
+      responses:
+        '200':
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update a product
+      operationId: updateProduct
+      tags:
+        - products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a product
+      operationId: deleteProduct
+      tags:
+        - products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product
+      responses:
+        '204':
+          description: Product deleted
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /inventory:
+    get:
+      summary: Get inventory status
+      operationId: getInventory
+      tags:
+        - inventory
+      responses:
+        '200':
+          description: Inventory status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+  /inventory/{productId}:
+    get:
+      summary: Get inventory for a product
+      operationId: getProductInventory
+      tags:
+        - inventory
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product
+      responses:
+        '200':
+          description: Product inventory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update inventory for a product
+      operationId: updateProductInventory
+      tags:
+        - inventory
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryUpdate'
+      responses:
+        '200':
+          description: Inventory updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - category
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          example: "Laptop"
+        description:
+          type: string
+          example: "High-performance laptop with 16GB RAM"
+        price:
+          type: number
+          format: double
+          example: 999.99
+        category:
+          type: string
+          example: "Electronics"
+        imageUrl:
+          type: string
+          format: uri
+          example: "https://example.com/images/laptop.jpg"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ProductCreate:
+      type: object
+      required:
+        - name
+        - price
+        - category
+      properties:
+        name:
+          type: string
+          example: "Laptop"
+        description:
+          type: string
+          example: "High-performance laptop with 16GB RAM"
+        price:
+          type: number
+          format: double
+          example: 999.99
+        category:
+          type: string
+          example: "Electronics"
+        imageUrl:
+          type: string
+          format: uri
+          example: "https://example.com/images/laptop.jpg"
+    ProductUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Laptop"
+        description:
+          type: string
+          example: "High-performance laptop with 16GB RAM"
+        price:
+          type: number
+          format: double
+          example: 999.99
+        category:
+          type: string
+          example: "Electronics"
+        imageUrl:
+          type: string
+          format: uri
+          example: "https://example.com/images/laptop.jpg"
+    InventoryItem:
+      type: object
+      required:
+        - productId
+        - quantity
+        - warehouseLocation
+      properties:
+        productId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        product:
+          $ref: '#/components/schemas/Product'
+        quantity:
+          type: integer
+          minimum: 0
+          example: 50
+        warehouseLocation:
+          type: string
+          example: "Building A, Section 5, Shelf 3"
+        lastUpdated:
+          type: string
+          format: date-time
+    InventoryUpdate:
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: integer
+          minimum: 0
+          example: 50
+        warehouseLocation:
+          type: string
+          example: "Building A, Section 5, Shelf 3"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string 
